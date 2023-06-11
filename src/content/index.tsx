@@ -1,6 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
-import { ActionIcon, Image, Tooltip } from '@mantine/core';
+import {
+  ActionIcon,
+  Autocomplete,
+  Button,
+  CloseButton,
+  Col,
+  Container,
+  Image,
+  Paper,
+  TextInput,
+  Tooltip,
+} from '@mantine/core';
 
 import { Content } from './Content';
 
@@ -72,25 +84,28 @@ chrome.runtime.onMessage.addListener(async function (message, sender, sendRespon
   }
 });
 
-document.addEventListener('mouseup', () => {
-  const selection = window.getSelection();
-  if (selection === undefined || selection === null) {
-    return;
-  }
-  if (selection.toString().length > 0) {
-    const oRange = selection.getRangeAt(0);
-    const oRect = oRange.getBoundingClientRect();
-    if (document.getElementsByTagName('my-extension-root').length > 0) {
-      return;
-    }
-    for (let i = 0; i < document.getElementsByTagName('my-extension-root').length; i++) {
-      document.getElementsByTagName('my-extension-root')[i].remove();
-    }
-    const container = document.createElement('my-extension-root-icon');
-    document.body.after(container);
-    createRoot(container).render(<Icon selectedText={selection.toString()} orect={oRect} />);
-  }
-});
+/**
+ * サンプルコードに載っていたが、不要なのでコメントアウトする
+ */
+// document.addEventListener('mouseup', () => {
+//   const selection = window.getSelection();
+//   if (selection === undefined || selection === null) {
+//     return;
+//   }
+//   if (selection.toString().length > 0) {
+//     const oRange = selection.getRangeAt(0);
+//     const oRect = oRange.getBoundingClientRect();
+//     if (document.getElementsByTagName('my-extension-root').length > 0) {
+//       return;
+//     }
+//     for (let i = 0; i < document.getElementsByTagName('my-extension-root').length; i++) {
+//       document.getElementsByTagName('my-extension-root')[i].remove();
+//     }
+//     const container = document.createElement('my-extension-root-icon');
+//     document.body.after(container);
+//     createRoot(container).render(<Icon selectedText={selection.toString()} orect={oRect} />);
+//   }
+// });
 
 const Icon = ({ selectedText, orect }: { selectedText: string; orect: DOMRect }) => {
   const handleClick = async () => {
@@ -148,3 +163,27 @@ const Icon = ({ selectedText, orect }: { selectedText: string; orect: DOMRect })
     </div>
   );
 };
+
+// ctrl+iを押すとinputタグが画面の中央に表示される
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'i') {
+    const div = document.createElement('div');
+    div.style.position = 'fixed';
+    div.style.top = '50%';
+    div.style.left = '50%';
+    div.style.width = '70%';
+    div.style.height = '300px';
+    div.style.transform = 'translate(-50%, -50%)';
+    document.body.appendChild(div);
+
+    // TODO: display flag的なものを持たせて、表示をトグルできるようにする
+    const RootComponent = () => (
+      <TextInput
+        placeholder="Type your command"
+        styles={{ input: { height: '60px', fontSize: 20 } }}
+      />
+    );
+
+    createRoot(div).render(<RootComponent />);
+  }
+});
