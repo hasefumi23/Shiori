@@ -1,18 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
-import {
-  ActionIcon,
-  Autocomplete,
-  Button,
-  CloseButton,
-  Col,
-  Container,
-  Image,
-  Paper,
-  TextInput,
-  Tooltip,
-} from '@mantine/core';
+import { ActionIcon, Image, TextInput, Tooltip } from '@mantine/core';
 
 import { Content } from './Content';
 
@@ -164,26 +153,36 @@ const Icon = ({ selectedText, orect }: { selectedText: string; orect: DOMRect })
   );
 };
 
+// Div element will be stored here after first creation
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let div: any = null;
+// ReactDOM root will be stored here after first creation
+let root = null;
+
 // ctrl+iを押すとinputタグが画面の中央に表示される
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'i') {
-    const div = document.createElement('div');
-    div.style.position = 'fixed';
-    div.style.top = '50%';
-    div.style.left = '50%';
-    div.style.width = '70%';
-    div.style.height = '300px';
-    div.style.transform = 'translate(-50%, -50%)';
-    document.body.appendChild(div);
+    if (div) {
+      div.style.display = div.style.display === 'none' ? 'block' : 'none';
+    } else {
+      div = document.createElement('div');
+      div.style.position = 'fixed';
+      div.style.top = '50%';
+      div.style.left = '50%';
+      div.style.width = '70%';
+      div.style.height = '300px';
+      div.style.transform = 'translate(-50%, -50%)';
+      document.body.appendChild(div);
 
-    // TODO: display flag的なものを持たせて、表示をトグルできるようにする
-    const RootComponent = () => (
-      <TextInput
-        placeholder="Type your command"
-        styles={{ input: { height: '60px', fontSize: 20 } }}
-      />
-    );
+      const RootComponent = () => (
+        <TextInput
+          placeholder="Type your command"
+          styles={{ input: { height: '60px', fontSize: 20 } }}
+        />
+      );
 
-    createRoot(div).render(<RootComponent />);
+      root = createRoot(div);
+      root.render(<RootComponent />);
+    }
   }
 });
