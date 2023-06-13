@@ -1,7 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { ActionIcon, Image, TextInput, Tooltip } from '@mantine/core';
+import { useForm } from '@mantine/form';
 
 import { Content } from './Content';
 
@@ -159,7 +159,10 @@ let div: any = null;
 // ReactDOM root will be stored here after first creation
 let root = null;
 
-// ctrl+iを押すとinputタグが画面の中央に表示される
+/**
+ * ctrl+iを押すとinputタグが画面の中央に表示される
+ * TODO: できれば、表示された瞬間にフォーカスを当てたい
+ */
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'i') {
     if (div) {
@@ -172,14 +175,33 @@ document.addEventListener('keydown', (e) => {
       div.style.width = '70%';
       div.style.height = '300px';
       div.style.transform = 'translate(-50%, -50%)';
+      div.style.zIndex = 2147483647;
       document.body.appendChild(div);
 
-      const RootComponent = () => (
-        <TextInput
-          placeholder="Type your command"
-          styles={{ input: { height: '60px', fontSize: 20 } }}
-        />
-      );
+      const RootComponent = () => {
+        const form = useForm({
+          initialValues: {
+            inputValue: '',
+          },
+        });
+
+        return (
+          <form
+            onSubmit={form.onSubmit((values) => {
+              // FIXME: ここにちゃんとデータを保存する処理を書く
+              console.log(values);
+              values.inputValue = '';
+              div.style.display = div.style.display === 'none' ? 'block' : 'none';
+            })}
+          >
+            <TextInput
+              placeholder="Type your command"
+              styles={{ input: { height: '60px', fontSize: 20 } }}
+              {...form.getInputProps('inputValue')}
+            />
+          </form>
+        );
+      };
 
       root = createRoot(div);
       root.render(<RootComponent />);
