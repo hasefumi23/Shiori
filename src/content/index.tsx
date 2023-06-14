@@ -161,12 +161,12 @@ let root = null;
 
 /**
  * ctrl+iを押すとinputタグが画面の中央に表示される
- * TODO: できれば、表示された瞬間にフォーカスを当てたい
  */
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'i') {
     if (div) {
       div.style.display = div.style.display === 'none' ? 'block' : 'none';
+      document.getElementById('shiori-input')?.focus();
     } else {
       div = document.createElement('div');
       div.style.position = 'fixed';
@@ -195,9 +195,11 @@ document.addEventListener('keydown', (e) => {
             })}
           >
             <TextInput
+              id="shiori-input"
               placeholder="Type your command"
               styles={{ input: { height: '60px', fontSize: 20 } }}
               {...form.getInputProps('inputValue')}
+              autoFocus={true}
             />
           </form>
         );
