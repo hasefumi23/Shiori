@@ -1,9 +1,16 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+import { getBucket } from '@extend-chrome/storage';
 import { ActionIcon, Image, TextInput, Tooltip } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 import { Content } from './Content';
+
+interface MyBucket {
+  note: string;
+}
+
+const bucket = getBucket<MyBucket>('shiori', 'local');
 
 const Main = ({
   orect,
@@ -187,8 +194,13 @@ document.addEventListener('keydown', (e) => {
 
         return (
           <form
-            onSubmit={form.onSubmit((values) => {
+            onSubmit={form.onSubmit(async (values) => {
+              // FIXME: 削除する
+              const beforeVal = await bucket.get();
+              console.log(`beforeVal: ${JSON.stringify(beforeVal)}`);
+
               // FIXME: ここにちゃんとデータを保存する処理を書く
+              await bucket.set({ note: values.inputValue });
               console.log(values);
               values.inputValue = '';
               div.style.display = div.style.display === 'none' ? 'block' : 'none';
