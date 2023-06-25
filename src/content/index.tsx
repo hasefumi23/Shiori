@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { getBucket } from '@extend-chrome/storage';
 import { ActionIcon, Image, TextInput, Tooltip } from '@mantine/core';
@@ -6,8 +6,15 @@ import { useForm } from '@mantine/form';
 
 import { Content } from './Content';
 
-interface MyBucket {
+interface ShioriNote {
   note: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface MyBucket {
+  [key: string]: ShioriNote;
 }
 
 const bucket = getBucket<MyBucket>('shiori', 'local');
@@ -162,63 +169,89 @@ const Icon = ({ selectedText, orect }: { selectedText: string; orect: DOMRect })
 
 // Div element will be stored here after first creation
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let div: any = null;
+// let div: any = null;
 // ReactDOM root will be stored here after first creation
-let root = null;
+// let root = null;
 
-/**
- * ctrl+iを押すとinputタグが画面の中央に表示される
- */
-document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.key === 'i') {
-    if (div) {
-      div.style.display = div.style.display === 'none' ? 'block' : 'none';
-      document.getElementById('shiori-input')?.focus();
-    } else {
-      div = document.createElement('div');
-      div.style.position = 'fixed';
-      div.style.top = '50%';
-      div.style.left = '50%';
-      div.style.width = '70%';
-      div.style.height = '300px';
-      div.style.transform = 'translate(-50%, -50%)';
-      div.style.zIndex = 2147483647;
-      document.body.appendChild(div);
+const RootComponent = () => {
+  const [isInputVisible, setInputVisible] = useState(false);
+  const form = useForm({
+    initialValues: {
+      inputValue: '',
+    },
+  });
 
-      const RootComponent = () => {
-        const form = useForm({
-          initialValues: {
-            inputValue: '',
-          },
-        });
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'i') {
+        setInputVisible((visible) => !visible);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
-        return (
-          <form
-            onSubmit={form.onSubmit(async (values) => {
-              // FIXME: 削除する
-              const beforeVal = await bucket.get();
-              console.log(`beforeVal: ${JSON.stringify(beforeVal)}`);
-
-              // FIXME: ここにちゃんとデータを保存する処理を書く
-              await bucket.set({ note: values.inputValue });
-              console.log(values);
-              values.inputValue = '';
-              div.style.display = div.style.display === 'none' ? 'block' : 'none';
-            })}
-          >
-            <TextInput
-              id="shiori-input"
-              placeholder="Type your command"
-              styles={{ input: { height: '60px', fontSize: 20 } }}
-              {...form.getInputProps('inputValue')}
-              autoFocus={true}
-            />
-          </form>
-        );
-      };
-
-      root = createRoot(div);
-      root.render(<RootComponent />);
+  // inputタグが表示される度にフォーカスを当てる
+  useEffect(() => {
+    if (isInputVisible) {
+      const inputElement = document.getElementById('shiori-input');
+      inputElement && inputElement.focus();
     }
-  }
-});
+  }, [isInputVisible]);
+
+  const handleSubmit = async (values: { inputValue: string }) => {
+    // FIXME: 削除する
+    const hostname = document.location.hostname;
+    const pathname = document.location.pathname;
+    const key = `${hostname}${pathname}`;
+    const beforeVal = await bucket.get((values: any) => {
+      return values[key];
+    });
+    console.log(`beforeVal: ${JSON.stringify(beforeVal)}`);
+    console.log(`keys: ${JSON.stringify(await bucket.getKeys())}`);
+    const newNote = beforeVal.note + '\n' + values.inputValue;
+
+    // FIXME: ここにちゃんとデータを保存する処理を書く
+    await bucket.set({
+      [key]: {
+        note: newNote,
+        title: document.title,
+        // FIXME: ここは、ちゃんと日付を扱うライブラリを導入する
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    });
+    console.log(newNote);
+    values.inputValue = '';
+    setInputVisible(false);
+  };
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: '250px',
+        left: '50%',
+        width: '60%',
+        height: '6px',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 10000,
+        display: isInputVisible ? 'block' : 'none',
+      }}
+    >
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <TextInput
+          id="shiori-input"
+          placeholder="Type your command"
+          styles={{ input: { height: '60px', fontSize: 20 } }}
+          {...form.getInputProps('inputValue')}
+          autoFocus={true}
+        />
+      </form>
+    </div>
+  );
+};
+
+const container = document.createElement('shiori-root');
+document.body.after(container);
+createRoot(container).render(<RootComponent />);
