@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { getBucket } from '@extend-chrome/storage';
-import { ActionIcon, Image, TextInput, Tooltip } from '@mantine/core';
+import { ActionIcon, Button, Image, Textarea, TextInput, Tooltip } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 import { Content } from './Content';
@@ -199,14 +199,24 @@ const RootComponent = () => {
     }
   }, [isInputVisible]);
 
+  useEffect(() => {
+    console.log('called.');
+    const shoriInput = document.getElementById('shiori-input');
+    if (!shoriInput) return;
+    shoriInput.addEventListener('keydown', function (event) {
+      if (event.ctrlKey && event.key === 'Enter') {
+        const shioriForm = document.getElementById('shiori-form-button') as HTMLButtonElement;
+        shioriForm && shioriForm.click();
+      }
+    });
+  }, []);
+
   const handleSubmit = async (values: { inputValue: string }) => {
     // FIXME: 削除する
     const hostname = document.location.hostname;
     const pathname = document.location.pathname;
     const key = `${hostname}${pathname}`;
-    const beforeVal = await bucket.get((values: any) => {
-      return values[key];
-    });
+    const beforeVal = (await bucket.get((values: any) => values[key])) || '';
     console.log(`beforeVal: ${JSON.stringify(beforeVal)}`);
     console.log(`keys: ${JSON.stringify(await bucket.getKeys())}`);
     const newNote = beforeVal.note + '\n' + values.inputValue;
@@ -239,14 +249,19 @@ const RootComponent = () => {
         display: isInputVisible ? 'block' : 'none',
       }}
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <TextInput
+      <form id="shiori-form" onSubmit={form.onSubmit(handleSubmit)}>
+        <Textarea
           id="shiori-input"
           placeholder="Type your command"
-          styles={{ input: { height: '60px', fontSize: 20 } }}
+          size="md"
+          autosize
+          minRows={2}
+          maxRows={10}
+          // styles={{ input: { height: '60px', fontSize: 20 } }}
           {...form.getInputProps('inputValue')}
           autoFocus={true}
         />
+        <Button id="shiori-form-button" type="submit" style={{ display: 'none' }} />
       </form>
     </div>
   );
