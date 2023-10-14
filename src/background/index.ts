@@ -1,12 +1,9 @@
 import { getBucket } from '@extend-chrome/storage';
 
 import { translate } from '../app/translate';
+import { ShioriBucket } from '../shared/models/shioriNote';
 
-interface MyBucket {
-  targetLang: string;
-}
-
-const bucket = getBucket<MyBucket>('my_bucket', 'sync');
+const bucket = getBucket<ShioriBucket>('my_bucket', 'sync');
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({

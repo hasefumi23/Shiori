@@ -4,20 +4,11 @@ import { getBucket } from '@extend-chrome/storage';
 import { ActionIcon, Button, Image, Textarea, TextInput, Tooltip } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
+import { ShioriBucket } from '../shared/models/shioriNote';
+
 import { Content } from './Content';
 
-interface ShioriNote {
-  note: string;
-  title: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface MyBucket {
-  [key: string]: ShioriNote;
-}
-
-const bucket = getBucket<MyBucket>('shiori', 'local');
+const bucket = getBucket<ShioriBucket>('shiori', 'local');
 
 const Main = ({
   orect,
@@ -216,16 +207,18 @@ const RootComponent = () => {
     const hostname = document.location.hostname;
     const pathname = document.location.pathname;
     const key = `${hostname}${pathname}`;
-    const beforeVal = (await bucket.get((values: any) => values[key])) || '';
+    const beforeVal = (await bucket.get((values: ShioriBucket) => values[key])) || {};
     console.log(`beforeVal: ${JSON.stringify(beforeVal)}`);
     console.log(`keys: ${JSON.stringify(await bucket.getKeys())}`);
-    const newNote = beforeVal.note + '\n' + values.inputValue;
+    const newNote =
+      beforeVal.note === undefined ? values.inputValue : beforeVal.note + '\n' + values.inputValue;
 
     // FIXME: ここにちゃんとデータを保存する処理を書く
     await bucket.set({
       [key]: {
         note: newNote,
         title: document.title,
+        href: document.location.href,
         // FIXME: ここは、ちゃんと日付を扱うライブラリを導入する
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

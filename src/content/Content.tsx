@@ -17,12 +17,9 @@ import {
 import { useClickOutside } from '@mantine/hooks';
 
 import { translate } from '../app/translate';
+import { ShioriBucket } from '../shared/models/shioriNote';
 
-interface MyBucket {
-  targetLang: string;
-}
-
-const bucket = getBucket<MyBucket>('my_bucket', 'sync');
+const bucket = getBucket<ShioriBucket>('my_bucket', 'sync');
 
 export const Content = ({
   translatedText,
