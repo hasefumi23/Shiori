@@ -242,8 +242,8 @@ const RootComponent = () => {
         position: 'fixed',
         top: '250px',
         left: '50%',
-        width: '60%',
-        height: '6px',
+        width: '40%',
+        height: '60px',
         transform: 'translate(-50%, -50%)',
         zIndex: 10000,
         display: isInputVisible ? 'block' : 'none',
@@ -252,10 +252,10 @@ const RootComponent = () => {
       <form id="shiori-form" onSubmit={form.onSubmit(handleSubmit)}>
         <Textarea
           id="shiori-input"
-          placeholder="Type your command"
-          size="md"
+          placeholder="メモを入力してください。Ctrl + Enter で保存します。"
+          size="lg"
           autosize
-          minRows={2}
+          minRows={10}
           maxRows={10}
           // styles={{ input: { height: '60px', fontSize: 20 } }}
           {...form.getInputProps('inputValue')}
