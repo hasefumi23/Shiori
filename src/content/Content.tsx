@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { MdDone, MdOutlineContentCopy, MdVolumeUp } from 'react-icons/md';
-import { getBucket } from '@extend-chrome/storage';
 import {
   ActionIcon,
   Avatar,
-  Box,
   CopyButton,
   Divider,
   Flex,
@@ -14,12 +12,10 @@ import {
   Text,
   Tooltip,
 } from '@mantine/core';
-import { useClickOutside } from '@mantine/hooks';
 
 import { translate } from '../app/translate';
-import { ShioriBucket } from '../shared/models/shioriNote';
 
-const bucket = getBucket<ShioriBucket>('my_bucket', 'sync');
+// const bucket = getBucket<ShioriBucket>('my_bucket', 'sync');
 
 export const Content = ({
   translatedText,
@@ -30,34 +26,23 @@ export const Content = ({
   originalText: string;
   targetLang: string;
 }) => {
-  const [opened, setOpened] = useState(true);
-  const [dialog, setDialog] = useState<HTMLDivElement | null>(null);
+  // const [opened, setOpened] = useState(true);
+  // const [dialog, setDialog] = useState<HTMLDivElement | null>(null);
   const [text, setText] = useState(translatedText);
   const [lang, setLang] = useState(targetLang);
-  useClickOutside(() => setOpened(false), null, [dialog]);
+  // useClickOutside(() => setOpened(false), null, [dialog]);
   const IconUrl = chrome.runtime.getURL('images/extension_128.png');
 
   const handleChange = async (value: string) => {
-    bucket.get({ targetLang: value });
+    // bucket.get({ targetLang: value });
     const newText = await translate(originalText, value);
     setText(newText);
     setLang(value);
   };
+  const test = '';
 
-  return opened ? (
-    <Box
-      sx={(theme) => ({
-        backgroundColor: 'white',
-        textAlign: 'left',
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.md,
-        maxWidth: 400,
-        boxShadow: '0 0 10px rgba(0,0,0,.3);',
-        zIndex: 2147483550,
-      })}
-      component="div"
-      ref={setDialog}
-    >
+  return test === '' ? (
+    <>
       <Flex pb="xs" gap="xs" justify="flex-start" align="center">
         <Avatar src={IconUrl} />
         <Text size="md">訳文</Text>
@@ -74,9 +59,9 @@ export const Content = ({
         />
       </Flex>
       <Divider />
-      <Stack pt="sm" spacing="xs" style={{ textAlign: 'left' }}>
+      <Stack pt="sm" style={{ textAlign: 'left' }}>
         <Text size="sm">{text}</Text>
-        <Group position="right" spacing="xs">
+        <Group>
           <Tooltip label="音声読み上げ" withArrow>
             <ActionIcon>
               <MdVolumeUp />
@@ -93,7 +78,7 @@ export const Content = ({
           </CopyButton>
         </Group>
       </Stack>
-    </Box>
+    </>
   ) : (
     <></>
   );

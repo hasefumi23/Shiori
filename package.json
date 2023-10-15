@@ -22,16 +22,15 @@
     "lint:prettier": "prettier \"**/*.(md|json|yml)\" --ignore-path .gitignore --check",
     "lint:stylelint": "stylelint \"**/*.css\" --ignore-path .gitignore",
     "test": "jest",
-    "test:types": "tsc --noEmit",
-    "prepare": "simple-git-hooks"
+    "test:types": "tsc --noEmit"
   },
   "dependencies": {
     "@eduardoac-skimlinks/webext-redux": "3.0.1-release-candidate",
     "@emotion/react": "11.11.1",
     "@extend-chrome/storage": "1.5.0",
-    "@mantine/core": "6.0.13",
-    "@mantine/form": "6.0.13",
-    "@mantine/hooks": "6.0.13",
+    "@mantine/core": "7.1.3",
+    "@mantine/form": "7.1.3",
+    "@mantine/hooks": "7.1.3",
     "@reduxjs/toolkit": "1.8.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",

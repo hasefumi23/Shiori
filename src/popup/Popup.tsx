@@ -1,17 +1,10 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { getBucket } from '@extend-chrome/storage';
 import { Button, Container, CopyButton, Popover, Text } from '@mantine/core';
 
 import { ShioriBucket, ShioriNote } from '../shared/models/shioriNote';
 
-/**
- * 1. 出力ボタンを表示する
- * 2. 出力ボタンを押すと以下の処理を実行する
- *     1. 現在保存しているShioriNoteを取得する
- *     2. クリップボードにコピーする
- */
-
-const bucket = getBucket<ShioriBucket>('shiori', 'local');
+const bucket = getBucket<ShioriBucket>('shiori', 'sync');
 
 const Popup = (): ReactElement => {
   // document.body.style.width = '15rem';
@@ -24,7 +17,7 @@ const Popup = (): ReactElement => {
   // 状態を管理するためのuseStateを追加
   const [str, setStr] = React.useState('');
   // コンポーネントがマウントされたときに非同期処理を行う
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       const keys = await bucket.getKeys();
       const noteArray = [];
@@ -45,7 +38,7 @@ const Popup = (): ReactElement => {
       <CopyButton value={str}>
         {({ copied, copy }) => (
           <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
-            {copied ? 'Copied url' : 'Copy url'}
+            {copied ? 'Copied' : 'Copy'}
           </Button>
         )}
       </CopyButton>
