@@ -15,8 +15,6 @@ import {
 
 import { translate } from '../app/translate';
 
-// const bucket = getBucket<ShioriBucket>('my_bucket', 'sync');
-
 export const Content = ({
   translatedText,
   originalText,
@@ -26,15 +24,11 @@ export const Content = ({
   originalText: string;
   targetLang: string;
 }) => {
-  // const [opened, setOpened] = useState(true);
-  // const [dialog, setDialog] = useState<HTMLDivElement | null>(null);
   const [text, setText] = useState(translatedText);
   const [lang, setLang] = useState(targetLang);
-  // useClickOutside(() => setOpened(false), null, [dialog]);
   const IconUrl = chrome.runtime.getURL('images/extension_128.png');
 
   const handleChange = async (value: string) => {
-    // bucket.get({ targetLang: value });
     const newText = await translate(originalText, value);
     setText(newText);
     setLang(value);

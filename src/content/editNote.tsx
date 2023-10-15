@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { getBucket } from '@extend-chrome/storage';
 import { Button, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
-import { ShioriBucket } from '../shared/models/shioriNote';
-import { getThisPageShiori, getThisPageShioriKey, newShiori } from '../shared/utils/shioriUtil';
-
-const bucket = getBucket<ShioriBucket>('shiori', 'sync');
+import {
+  getThisPageShiori,
+  getThisPageShioriKey,
+  newShioriNote,
+  saveShioriNote,
+} from '../shared/utils/shioriUtil';
 
 export const EditNote = () => {
   const editForm = useForm({
@@ -34,6 +35,7 @@ export const EditNote = () => {
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // inputタグが表示される度にフォーカスを当てる
@@ -59,15 +61,14 @@ export const EditNote = () => {
     const key = getThisPageShioriKey();
     let currentShiori = await getThisPageShiori();
     if (currentShiori === undefined) {
-      currentShiori = newShiori();
+      currentShiori = newShioriNote();
     }
     console.log(`currentShiori: ${JSON.stringify(currentShiori)}`);
     const newNote = values.note;
     console.log(`newNote: ${newNote}`);
 
-    await bucket.set({
-      [key]: { ...currentShiori, note: newNote },
-    });
+    const newShiori = { ...currentShiori, note: newNote, updatedAt: new Date().toISOString() };
+    await saveShioriNote(key, newShiori);
     setInputVisible(false);
   };
 

@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getBucket } from '@extend-chrome/storage';
 import { Button, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 import { ShioriBucket } from '../shared/models/shioriNote';
-
-const bucket = getBucket<ShioriBucket>('shiori', 'sync');
+import { shioriBucket } from '../shared/utils/shioriUtil';
 
 /**
  * @deprecated EditFormとSimpleInputの併用は、あまり良くないアイディアだと思うので、このコンポーネントは一旦非推奨にしておく。
@@ -53,21 +51,20 @@ export const SimpleInput = () => {
     const hostname = document.location.hostname;
     const pathname = document.location.pathname;
     const key = `${hostname}${pathname}`;
-    const beforeVal = (await bucket.get((values: ShioriBucket) => values[key])) || {};
+    const beforeVal = (await shioriBucket.get((values: ShioriBucket) => values[key])) || {};
     console.log(`beforeVal: ${JSON.stringify(beforeVal)}`);
-    console.log(`keys: ${JSON.stringify(await bucket.getKeys())}`);
+    console.log(`keys: ${JSON.stringify(await shioriBucket.getKeys())}`);
     const newNote =
       beforeVal.note === undefined ? values.inputValue : beforeVal.note + '\n' + values.inputValue;
 
-    // FIXME: ここにちゃんとデータを保存する処理を書く
-    await bucket.set({
+    const current = new Date().toISOString();
+    await shioriBucket.set({
       [key]: {
         note: newNote,
         title: document.title,
         href: document.location.href,
-        // FIXME: ここは、ちゃんと日付を扱うライブラリを導入する
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: current,
+        updatedAt: current,
       },
     });
     console.log(newNote);
