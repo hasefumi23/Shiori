@@ -1,22 +1,19 @@
 import React, { ReactElement, useEffect } from 'react';
-import { Button, Container, CopyButton, Stack } from '@mantine/core';
-import { addDays, isSameDay, isThisWeek, setDefaultOptions } from 'date-fns';
+import Button from 'react-bootstrap/Button';
+import Stack from 'react-bootstrap/Stack';
+import { addDays, setDefaultOptions } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
-import { ShioriBucket, ShioriNote } from '../shared/models/shioriNote';
-import { newShioriNote, saveShioriNote, shioriBucket } from '../shared/utils/shioriUtil';
+import { ShioriNote } from '../shared/models/shioriNote';
+import {
+  filterThisWeekShiori,
+  filterTodaysShiori,
+  getAllShiori,
+  newShioriNote,
+  saveShioriNote,
+} from '../shared/utils/shioriUtil';
 
 setDefaultOptions({ locale: ja });
-
-const getAllShiori = async (): Promise<ShioriNote[]> => {
-  const keys = await shioriBucket.getKeys();
-  const noteArray = [];
-  for (const key of keys) {
-    const val = await shioriBucket.get((values: ShioriBucket) => values[key]);
-    noteArray.push(val);
-  }
-  return noteArray;
-};
 
 const saveTestData = async () => {
   const shiori = newShioriNote();
@@ -48,9 +45,6 @@ const saveTestData = async () => {
 };
 
 const Popup = (): ReactElement => {
-  document.body.style.width = '15rem';
-  document.body.style.height = '10rem';
-
   const formatShioriNote = (note: ShioriNote): string => {
     return `## [${note.title}](${note.href})\n\n${note.note}`;
   };
@@ -70,16 +64,14 @@ const Popup = (): ReactElement => {
       setAllShiori(shioris.map((shiori) => formatShioriNote(shiori)).join('\n\n'));
 
       // 今日分のShioriを取得して、設定する
-      const todayContent = shioris
-        .filter((shiori) => isSameDay(new Date(shiori.updatedAt), new Date()))
+      const todayContent = filterTodaysShiori(shioris)
         .map((shiori) => formatShioriNote(shiori))
         .join('\n\n');
       console.log(`todayContent: ${todayContent}`);
       setTodayShiori(todayContent);
 
       // 今週分のShioriを取得して、設定する
-      const thisWeekContent = shioris
-        .filter((shiori) => isThisWeek(new Date(shiori.updatedAt)))
+      const thisWeekContent = filterThisWeekShiori(shioris)
         .map((shiori) => formatShioriNote(shiori))
         .join('\n\n');
       console.log(`thisWeekContent ${thisWeekContent}`);
@@ -90,33 +82,36 @@ const Popup = (): ReactElement => {
     fetchData();
   }, []);
 
-  // TODO: 全然styleがあたっていないので、いずれ直す
+  const buttonStyle = {
+    borderRadius: '0px',
+    border: '0px',
+    padding: '10px',
+  };
+
   return (
-    <Container>
-      <Stack>
-        <CopyButton value={todayShiori}>
-          {({ copied, copy }) => (
-            <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
-              {copied ? '今日のShioriをコピー!' : '今日のShioriをコピー'}
-            </Button>
-          )}
-        </CopyButton>
-        <CopyButton value={thisWeekShiori}>
-          {({ copied, copy }) => (
-            <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
-              {copied ? '今週のShioriをコピー!' : '今週のShioriをコピー'}
-            </Button>
-          )}
-        </CopyButton>
-        <CopyButton value={allShiori}>
-          {({ copied, copy }) => (
-            <Button color={copied ? 'teal' : 'blue'} onClick={copy}>
-              {copied ? '全てのShioriをコピー!' : '全てのShioriをコピー'}
-            </Button>
-          )}
-        </CopyButton>
-      </Stack>
-    </Container>
+    <Stack style={{ width: '380px' }}>
+      <Button
+        variant="primary"
+        style={buttonStyle}
+        onClick={async () => await navigator.clipboard.writeText(todayShiori)}
+      >
+        今日のShioriをコピー
+      </Button>
+      <Button
+        variant="secondary"
+        style={buttonStyle}
+        onClick={async () => await navigator.clipboard.writeText(thisWeekShiori)}
+      >
+        今週のShioriをコピー
+      </Button>
+      <Button
+        variant="success"
+        style={buttonStyle}
+        onClick={async () => await navigator.clipboard.writeText(allShiori)}
+      >
+        全てのShioriをコピー
+      </Button>
+    </Stack>
   );
 };
 

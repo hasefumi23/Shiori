@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 
 import {
+  getOrCreateShioriNote,
   getThisPageShiori,
   getThisPageShioriKey,
   newShioriNote,
@@ -14,8 +15,10 @@ export const EditNote = () => {
   // bucketから取得した値を初期値として設定する
   useEffect(() => {
     const getInitVal = async () => {
-      const shiori = await getThisPageShiori();
-      const note = shiori?.note || '';
+      const key = getThisPageShioriKey();
+      // このページのShioriが存在しない場合は、新規に作成する
+      const shiori = await getOrCreateShioriNote(key);
+      const note = shiori.note;
       setInputValue(note);
     };
     getInitVal();
@@ -96,7 +99,13 @@ export const EditNote = () => {
           id="shiori-edit"
           as="textarea"
           placeholder="Ctrl + Enter で保存します。"
-          style={{ height: '200px', width: '100%', border: '1px solid #ccc' }}
+          style={{
+            height: '200px',
+            width: '100%',
+            border: '1px solid #ccc',
+            opacity: 0.8,
+            padding: '10px',
+          }}
           autoFocus={true}
           value={inputValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

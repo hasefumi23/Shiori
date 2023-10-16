@@ -1,15 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { MantineProvider } from '@mantine/core';
 
 import { EditNote } from './editNote';
 
 const App = () => {
-  return (
-    <MantineProvider>
-      <EditNote />
-    </MantineProvider>
-  );
+  return <EditNote />;
 };
 
 const container = document.createElement('shiori-root');
