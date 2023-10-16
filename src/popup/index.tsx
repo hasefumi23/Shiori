@@ -3,10 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 import Popup from './Popup';
 
-import '../tailwind.css';
+// popupの場合、このimportがないとstyleが適用されない
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <Popup />
-  </React.StrictMode>
-);
+createRoot(document.getElementById('root') as HTMLElement).render(<Popup />);
