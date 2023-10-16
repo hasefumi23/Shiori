@@ -18,6 +18,7 @@ export const EditNote = () => {
 
   const [isInputVisible, setInputVisible] = useState(false);
   useEffect(() => {
+    // この辺、mantineのhookを使って書きたい
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'i') {
         e.preventDefault();
@@ -47,6 +48,7 @@ export const EditNote = () => {
   }, [isInputVisible]);
 
   useEffect(() => {
+    // この辺、mantineのhookを使って書きたい
     const shoriInput = document.getElementById('shiori-edit');
     if (!shoriInput) return;
     shoriInput.addEventListener('keydown', function (event) {
@@ -63,9 +65,7 @@ export const EditNote = () => {
     if (currentShiori === undefined) {
       currentShiori = newShioriNote();
     }
-    console.log(`currentShiori: ${JSON.stringify(currentShiori)}`);
     const newNote = values.note;
-    console.log(`newNote: ${newNote}`);
 
     const newShiori = { ...currentShiori, note: newNote, updatedAt: new Date().toISOString() };
     await saveShioriNote(key, newShiori);
@@ -105,7 +105,7 @@ export const EditNote = () => {
             input: { width: '100% !important' },
           }}
           id="shiori-edit"
-          placeholder="編集してください。Ctrl + Enter で保存します。"
+          placeholder="Ctrl + Enter で保存します。"
           minRows={10}
           maxRows={20}
           autosize
