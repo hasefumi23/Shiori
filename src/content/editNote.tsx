@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Textarea } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import Form from 'react-bootstrap/Form';
 
 import {
   getThisPageShiori,
@@ -10,15 +9,23 @@ import {
 } from '../shared/utils/shioriUtil';
 
 export const EditNote = () => {
-  const editForm = useForm({
-    initialValues: {
-      note: '',
-    },
-  });
-
-  const [isInputVisible, setInputVisible] = useState(false);
+  // 入力値の状態を管理するための state と setter
+  const [inputValue, setInputValue] = useState('');
+  // bucketから取得した値を初期値として設定する
   useEffect(() => {
-    // この辺、mantineのhookを使って書きたい
+    const getInitVal = async () => {
+      const shiori = await getThisPageShiori();
+      const note = shiori?.note || '';
+      setInputValue(note);
+    };
+    getInitVal();
+  }, []);
+
+  // フォームの表示状態を管理するための state と setter
+  const [isInputVisible, setInputVisible] = useState(false);
+
+  useEffect(() => {
+    // TODO: この辺、mantineのhookを使って書きたい
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'i') {
         e.preventDefault();
@@ -26,9 +33,8 @@ export const EditNote = () => {
           // 非表示状態から表示された場合は、選択されているテキストを挿入する
           const selectedText = window.getSelection()?.toString();
           if (selectedText !== '') {
-            // editFormから値が取れないので、素のjsで値を取得する
-            const inputNote = document.getElementById('shiori-edit')?.textContent || '';
-            editForm.setValues({ note: inputNote + '\n\n>' + selectedText });
+            const inputNote = inputValue;
+            setInputValue(inputNote + '\n\n>' + selectedText);
           }
         }
         setInputVisible((visible) => !visible);
@@ -59,32 +65,18 @@ export const EditNote = () => {
     });
   }, []);
 
-  const handleSubmit = async (values: { note: string }) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     const key = getThisPageShioriKey();
     let currentShiori = await getThisPageShiori();
     if (currentShiori === undefined) {
       currentShiori = newShioriNote();
     }
-    const newNote = values.note;
-
+    const newNote = inputValue;
     const newShiori = { ...currentShiori, note: newNote, updatedAt: new Date().toISOString() };
     await saveShioriNote(key, newShiori);
     setInputVisible(false);
   };
-
-  // bucketから初期値を取得する処理はawaitを使う必要があるので、useEffectを使う
-  useEffect(() => {
-    const getInitVal = async () => {
-      const shiori = await getThisPageShiori();
-      const note = shiori?.note || '';
-      // https://mantine.dev/form/values/#setinitialvalues-handler に従う
-      editForm.setInitialValues({ note: note });
-      editForm.setValues({ note: note });
-    };
-    getInitVal();
-    // https://mantine.dev/form/values/#setinitialvalues-handler に従って、第二引数に空配列を指定する
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div
@@ -99,20 +91,19 @@ export const EditNote = () => {
         display: isInputVisible ? 'block' : 'none',
       }}
     >
-      <form id="shiori-edit-form" onSubmit={editForm.onSubmit(handleSubmit)}>
-        <Textarea
-          style={{
-            input: { width: '100% !important' },
-          }}
+      <form id="shiori-edit-form" onSubmit={handleSubmit}>
+        <Form.Control
           id="shiori-edit"
+          as="textarea"
           placeholder="Ctrl + Enter で保存します。"
-          minRows={10}
-          maxRows={20}
-          autosize
-          {...editForm.getInputProps('note')}
+          style={{ height: '200px', width: '100%', border: '1px solid #ccc' }}
           autoFocus={true}
+          value={inputValue}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setInputValue(e.target.value);
+          }}
         />
-        <Button id="shiori-edit-form-button" type="submit" style={{ display: 'none' }} />
+        <button id="shiori-edit-form-button" type="submit" style={{ display: 'none' }} />
       </form>
     </div>
   );
