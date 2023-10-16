@@ -5,9 +5,6 @@ const manifest: ManifestV3Export = {
   name: 'Browser Extension TypeScript & React Starter',
   description: 'Browser Extension, TypeScript, React',
   version: '0.1',
-  background: {
-    service_worker: 'src/background/index.ts',
-  },
   content_scripts: [
     {
       matches: ['http://*/*', 'https://*/*', 'file:///*'],
@@ -19,15 +16,6 @@ const manifest: ManifestV3Export = {
     page: 'src/options/options.html',
     open_in_tab: true,
   },
-  web_accessible_resources: [
-    {
-      resources: [
-        // this file is web accessible; it supports HMR b/c it's declared in `rollupOptions.input`
-        'src/welcome/welcome.html',
-      ],
-      matches: ['<all_urls>'],
-    },
-  ],
   action: {
     default_popup: 'src/popup/popup.html',
     default_icon: {
