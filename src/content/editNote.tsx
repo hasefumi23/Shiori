@@ -103,7 +103,7 @@ export const EditNote = () => {
             height: '200px',
             width: '100%',
             border: '1px solid #ccc',
-            opacity: 0.8,
+            opacity: 0.95,
             padding: '10px',
           }}
           autoFocus={true}
