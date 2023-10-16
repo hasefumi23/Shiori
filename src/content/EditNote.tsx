@@ -88,19 +88,19 @@ export const EditNote = () => {
         top: '250px',
         left: '50%',
         width: '40%',
-        height: '60px',
-        transform: 'translate(-50%, -50%)',
+        height: '500px',
+        transform: 'translate(-50%, -15%)',
         zIndex: 10000,
         display: isInputVisible ? 'block' : 'none',
       }}
     >
-      <form id="shiori-edit-form" onSubmit={handleSubmit}>
+      <form id="shiori-edit-form" style={{ height: '100%' }} onSubmit={handleSubmit}>
         <Form.Control
           id="shiori-edit"
           as="textarea"
           placeholder="Ctrl + Enter で保存します。"
           style={{
-            height: '200px',
+            height: '100%',
             width: '100%',
             border: '1px solid #ccc',
             opacity: 0.95,
