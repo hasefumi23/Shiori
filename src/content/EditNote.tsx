@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 
 import {
-  getOrCreateShioriNote,
   getThisPageShiori,
   getThisPageShioriKey,
   newShioriNote,
@@ -15,10 +14,8 @@ export const EditNote = () => {
   // bucketから取得した値を初期値として設定する
   useEffect(() => {
     const getInitVal = async () => {
-      const key = getThisPageShioriKey();
-      // このページのShioriが存在しない場合は、新規に作成する
-      const shiori = await getOrCreateShioriNote(key);
-      const note = shiori.note;
+      const shiori = await getThisPageShiori();
+      const note = shiori?.note;
       setInputValue(note);
     };
     getInitVal();
