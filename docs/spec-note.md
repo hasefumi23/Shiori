@@ -7,7 +7,7 @@
 
 ## 作りたい chrome extension
 
-```
+```txt
 ブラウザでwebページを見ているときに、メモを取りたいことがある。
 そういう時に、サクッとメモを取ることができるchrome extensionを作りたい。
 ctrl-iを押すと、inputが出てきて、メモを入力してenterを押すと保存される。

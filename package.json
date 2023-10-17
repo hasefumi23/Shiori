@@ -16,11 +16,9 @@
     "format": "run-p format:*",
     "format:eslint": "run-s \" lint:eslint --fix \"",
     "format:prettier": "run-s \" lint:prettier --write \"",
-    "format:stylelint": "run-s \" lint:stylelint --fix \"",
     "lint": "run-p lint:*",
     "lint:eslint": "eslint . --ext .js,.ts,.tsx --max-warnings 0 --ignore-path .gitignore",
     "lint:prettier": "prettier \"**/*.(md|json|yml)\" --ignore-path .gitignore --check",
-    "lint:stylelint": "stylelint \"**/*.css\" --ignore-path .gitignore",
     "test": "jest",
     "test:types": "tsc --noEmit"
   },
