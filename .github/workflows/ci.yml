@@ -13,6 +13,7 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
+      - uses: Kesin11/actions-timeline@v1
       - uses: actions/checkout@v3
 
       - name: Setup node
