@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
-import { addDays, setDefaultOptions } from 'date-fns';
+import { setDefaultOptions } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 import { ShioriNote } from '../shared/models/shioriNote';
@@ -9,12 +9,15 @@ import {
   filterThisWeekShiori,
   filterTodaysShiori,
   getAllShiori,
-  newShioriNote,
-  saveShioriNote,
+  getThisPageShiori,
 } from '../shared/utils/shioriUtil';
+
+import './popup.css';
 
 setDefaultOptions({ locale: ja });
 
+/**
+ * 
 const saveTestData = async () => {
   const shiori = newShioriNote();
 
@@ -43,6 +46,7 @@ const saveTestData = async () => {
   };
   await saveShioriNote('1週間後のShiori', nextWeekShiori);
 };
+ */
 
 const Popup = (): ReactElement => {
   const formatShioriNote = (note: ShioriNote): string => {
@@ -50,14 +54,15 @@ const Popup = (): ReactElement => {
   };
 
   // 状態を管理するためのuseStateを追加
+  const [thisPageShiori, setThisPageShiori] = React.useState('');
   const [todayShiori, setTodayShiori] = React.useState('');
   const [thisWeekShiori, setThisWeekShiori] = React.useState('');
   const [allShiori, setAllShiori] = React.useState('');
 
   useEffect(() => {
     const fetchData = async () => {
-      // FIXME: 一時的にテストデータを作成するコードなので、後で削除する
-      await saveTestData();
+      // await saveTestData();
+      setThisPageShiori((await getThisPageShiori())?.note || '');
 
       // 現在保持している全てのShioriを取得して、設定する
       const shioris = await getAllShiori();
@@ -82,6 +87,44 @@ const Popup = (): ReactElement => {
     fetchData();
   }, []);
 
+  return (
+    <Stack style={{ width: '380px' }}>
+      <CopyButton
+        variant="light"
+        copyText={thisPageShiori}
+        buttonText="このページのShioriをコピー"
+      />
+      <CopyButton variant="primary" copyText={todayShiori} buttonText="今日のShioriをコピー" />
+      <CopyButton variant="secondary" copyText={thisWeekShiori} buttonText="今週のShioriをコピー" />
+      <CopyButton variant="success" copyText={allShiori} buttonText="全てのShioriをコピー" />
+    </Stack>
+  );
+};
+
+const CopyButton = ({
+  variant,
+  copyText,
+  buttonText,
+}: {
+  variant: string;
+  copyText: string;
+  buttonText: string;
+}): ReactElement => {
+  const [clicked, setClicked] = React.useState(false);
+
+  useEffect(() => {
+    // clickedがtrueの場合のみ、タイマーをセットする
+    if (clicked) {
+      // クリック後3秒後にメッセージをリセットする
+      const timer = setTimeout(() => {
+        setClicked(false);
+      }, 300);
+
+      // コンポーネントのクリーンアップ時にタイマーをクリアする
+      return () => clearTimeout(timer);
+    }
+  }, [clicked]);
+
   const buttonStyle = {
     borderRadius: '0px',
     border: '0px',
@@ -89,29 +132,17 @@ const Popup = (): ReactElement => {
   };
 
   return (
-    <Stack style={{ width: '380px' }}>
-      <Button
-        variant="primary"
-        style={buttonStyle}
-        onClick={async () => await navigator.clipboard.writeText(todayShiori)}
-      >
-        今日のShioriをコピー
-      </Button>
-      <Button
-        variant="secondary"
-        style={buttonStyle}
-        onClick={async () => await navigator.clipboard.writeText(thisWeekShiori)}
-      >
-        今週のShioriをコピー
-      </Button>
-      <Button
-        variant="success"
-        style={buttonStyle}
-        onClick={async () => await navigator.clipboard.writeText(allShiori)}
-      >
-        全てのShioriをコピー
-      </Button>
-    </Stack>
+    <Button
+      variant={variant}
+      style={buttonStyle}
+      className={clicked ? 'copy-button-clicked-animation' : ''}
+      onClick={async () => {
+        await navigator.clipboard.writeText(copyText);
+        setClicked(true);
+      }}
+    >
+      {buttonText}
+    </Button>
   );
 };
 

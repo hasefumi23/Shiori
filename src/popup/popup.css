@@ -1,0 +1,22 @@
+@keyframes scanning {
+  0% { background-position: 100% }
+  50% { background-position: 50% }
+  100% { background-position: 0% }
+}
+
+.copy-button-clicked-animation {
+  animation-name: scanning;
+  animation-duration: 0.3s;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+  background-size: 300% 100%;
+  background-position: 0%;
+  background-image: linear-gradient(
+    90deg,
+    #FFF 0%,   /* backgroundColor */
+    #FFF 35%,  /* backgroundColor */
+    #000 60%,  /* textColor */
+    #FFF 60%,  /* backgroundColor */
+    #FFF 100%  /* backgroundColor */
+  );
+}
