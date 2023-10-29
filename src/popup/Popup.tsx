@@ -54,7 +54,7 @@ const Popup = (): ReactElement => {
   };
 
   // 状態を管理するためのuseStateを追加
-  const [thisPageShiori, setThisPageShiori] = React.useState('');
+  // const [thisPageShiori, setThisPageShiori] = React.useState('');
   const [todayShiori, setTodayShiori] = React.useState('');
   const [thisWeekShiori, setThisWeekShiori] = React.useState('');
   const [allShiori, setAllShiori] = React.useState('');
@@ -89,11 +89,14 @@ const Popup = (): ReactElement => {
 
   return (
     <Stack style={{ width: '380px' }}>
+      {/*
+      FIXME: popupから開いている画面のurlを取得する方法がわからないので、コメントアウトしておく
       <CopyButton
         variant="light"
         copyText={thisPageShiori}
         buttonText="このページのShioriをコピー"
       />
+       */}
       <CopyButton variant="primary" copyText={todayShiori} buttonText="今日のShioriをコピー" />
       <CopyButton variant="secondary" copyText={thisWeekShiori} buttonText="今週のShioriをコピー" />
       <CopyButton variant="success" copyText={allShiori} buttonText="全てのShioriをコピー" />
