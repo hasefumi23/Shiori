@@ -62,7 +62,7 @@ const Popup = (): ReactElement => {
   useEffect(() => {
     const fetchData = async () => {
       // await saveTestData();
-      setThisPageShiori((await getThisPageShiori())?.note || '');
+      // setThisPageShiori((await getThisPageShiori())?.note || '');
 
       // 現在保持している全てのShioriを取得して、設定する
       const shioris = await getAllShiori();
