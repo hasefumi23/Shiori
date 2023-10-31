@@ -12,6 +12,13 @@ export const getThisPageShioriKey = () => {
   return key;
 };
 
+export const buildShioriKeyByUrl = (url: string) => {
+  const hostname = new URL(url).hostname;
+  const pathname = new URL(url).pathname;
+  const key = `${hostname}${pathname}`;
+  return key;
+};
+
 export const getThisPageShiori = async () => {
   const shiori = await shioriBucket.get((values: ShioriBucket) => values[getThisPageShioriKey()]);
   return shiori;
