@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
 import { setDefaultOptions } from 'date-fns';
@@ -6,10 +6,11 @@ import { ja } from 'date-fns/locale';
 
 import { ShioriNote } from '../shared/models/shioriNote';
 import {
+  buildShioriKeyByUrl,
   filterThisWeekShiori,
   filterTodaysShiori,
   getAllShiori,
-  getThisPageShiori,
+  getShioriByKey,
 } from '../shared/utils/shioriUtil';
 
 import './popup.css';
@@ -48,21 +49,36 @@ const saveTestData = async () => {
 };
  */
 
+async function getCurrentPageUrl() {
+  // エディター上ではエラーになるが、実際には動く
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return tabs[0].url;
+}
 const Popup = (): ReactElement => {
   const formatShioriNote = (note: ShioriNote): string => {
     return `## [${note.title}](${note.href})\n\n${note.note}`;
   };
 
   // 状態を管理するためのuseStateを追加
-  // const [thisPageShiori, setThisPageShiori] = React.useState('');
-  const [todayShiori, setTodayShiori] = React.useState('');
-  const [thisWeekShiori, setThisWeekShiori] = React.useState('');
-  const [allShiori, setAllShiori] = React.useState('');
+  const [thisPageShiori, setThisPageShiori] = useState('');
+  const [todayShiori, setTodayShiori] = useState('');
+  const [thisWeekShiori, setThisWeekShiori] = useState('');
+  const [allShiori, setAllShiori] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       // await saveTestData();
-      // setThisPageShiori((await getThisPageShiori())?.note || '');
+
+      // 現在アクティブなページShioriを取得して、設定する
+      // ポップアップからは、現在アクティブなページのurlの取得がとても面倒だが、こう書くしかない
+      const curPageUrl = await getCurrentPageUrl();
+      const curPageShioriKey = buildShioriKeyByUrl(curPageUrl);
+      const curPageShiori = await getShioriByKey(curPageShioriKey);
+      setThisPageShiori(formatShioriNote(curPageShiori));
 
       // 現在保持している全てのShioriを取得して、設定する
       const shioris = await getAllShiori();
@@ -72,14 +88,12 @@ const Popup = (): ReactElement => {
       const todayContent = filterTodaysShiori(shioris)
         .map((shiori) => formatShioriNote(shiori))
         .join('\n\n');
-      console.log(`todayContent: ${todayContent}`);
       setTodayShiori(todayContent);
 
       // 今週分のShioriを取得して、設定する
       const thisWeekContent = filterThisWeekShiori(shioris)
         .map((shiori) => formatShioriNote(shiori))
         .join('\n\n');
-      console.log(`thisWeekContent ${thisWeekContent}`);
 
       setThisWeekShiori(thisWeekContent);
     };
@@ -89,14 +103,11 @@ const Popup = (): ReactElement => {
 
   return (
     <Stack style={{ width: '380px' }}>
-      {/*
-      FIXME: popupから開いている画面のurlを取得する方法がわからないので、コメントアウトしておく
       <CopyButton
         variant="light"
         copyText={thisPageShiori}
         buttonText="このページのShioriをコピー"
       />
-       */}
       <CopyButton variant="primary" copyText={todayShiori} buttonText="今日のShioriをコピー" />
       <CopyButton variant="secondary" copyText={thisWeekShiori} buttonText="今週のShioriをコピー" />
       <CopyButton variant="success" copyText={allShiori} buttonText="全てのShioriをコピー" />
@@ -113,7 +124,7 @@ const CopyButton = ({
   copyText: string;
   buttonText: string;
 }): ReactElement => {
-  const [clicked, setClicked] = React.useState(false);
+  const [clicked, setClicked] = useState(false);
 
   useEffect(() => {
     // clickedがtrueの場合のみ、タイマーをセットする
