@@ -25,7 +25,8 @@ export const EditNote = () => {
   const [isInputVisible, setInputVisible] = useState(false);
 
   useEffect(() => {
-    // TODO: この辺、mantineのhookを使って書きたい
+    // Ctrl + i でフォームの表示をトグルするための処理
+    // TODO: この辺いい感じのhookを使って書きたい
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'i') {
         e.preventDefault();
@@ -33,8 +34,9 @@ export const EditNote = () => {
           // 非表示状態から表示された場合は、選択されているテキストを挿入する
           const selectedText = window.getSelection()?.toString();
           if (selectedText !== '') {
-            const inputNote = inputValue;
-            setInputValue(inputNote + '\n\n>' + selectedText);
+            // inputValueだと、値がうまく取れないので、DOMから直接取得する
+            const inputNote = document.getElementById('shiori-edit')?.textContent || '';
+            setInputValue(inputNote + '\n' + selectedText);
           }
         }
         setInputVisible((visible) => !visible);
@@ -54,6 +56,7 @@ export const EditNote = () => {
   }, [isInputVisible]);
 
   useEffect(() => {
+    // Ctrl + Enter で保存するための処理
     // この辺、mantineのhookを使って書きたい
     const shoriInput = document.getElementById('shiori-edit');
     if (!shoriInput) return;
