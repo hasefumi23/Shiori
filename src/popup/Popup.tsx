@@ -60,6 +60,11 @@ async function getCurrentPageUrl() {
 }
 const Popup = (): ReactElement => {
   const formatShioriNote = (note: ShioriNote): string => {
+    if (note == null) {
+      console.warn('note is null');
+      return '';
+    }
+
     return `## [${note.title}](${note.href})\n\n${note.note}`;
   };
 

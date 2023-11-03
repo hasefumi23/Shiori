@@ -60,6 +60,7 @@ export const getAllShiori = async (): Promise<ShioriNote[]> => {
   const noteArray = [];
   for (const key of keys) {
     const val = await shioriBucket.get((values: ShioriBucket) => values[key]);
+    if (val == null) continue;
     noteArray.push(val);
   }
   return noteArray;
