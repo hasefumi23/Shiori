@@ -4,11 +4,11 @@ import Stack from 'react-bootstrap/Stack';
 import { setDefaultOptions } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
-import { ShioriNote } from '../shared/models/shioriNote';
 import {
   buildShioriKeyByUrl,
   filterThisWeekShiori,
   filterTodaysShiori,
+  formatShioriNote,
   getAllShiori,
   getShioriByKey,
 } from '../shared/utils/shioriUtil';
@@ -59,15 +59,6 @@ async function getCurrentPageUrl() {
   return tabs[0].url;
 }
 const Popup = (): ReactElement => {
-  const formatShioriNote = (note: ShioriNote): string => {
-    if (note == null) {
-      console.warn('note is null');
-      return '';
-    }
-
-    return `## [${note.title}](${note.href})\n\n${note.note}`;
-  };
-
   // 状態を管理するためのuseStateを追加
   const [thisPageShiori, setThisPageShiori] = useState('');
   const [todayShiori, setTodayShiori] = useState('');

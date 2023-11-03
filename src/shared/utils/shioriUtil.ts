@@ -75,3 +75,12 @@ export const filterThisWeekShiori = (shioris: ShioriNote[]) => {
   const filtered = shioris.filter((shiori) => isThisWeek(new Date(shiori.updatedAt)));
   return filtered;
 };
+
+export const formatShioriNote = (note: ShioriNote): string => {
+  if (note == null) {
+    console.warn('note is null');
+    return '';
+  }
+
+  return `### [${note.title}](${note.href})\n\n${note.note}`;
+};
